@@ -3,7 +3,7 @@ from email_sender import send_data
 from log import write_log, sent_this_month
 
 
-CHOSEN_SERVICE = 'yandex'
+CHOSEN_SERVICE = 'gmail'
 
 if __name__ == '__main__':
     values = safe_input()

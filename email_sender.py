@@ -11,7 +11,7 @@ def _data_preparing(data_ordered: WaterValue, sender, recipient) -> MIMEMultipar
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = recipient
-    msg['Subject'] = 'Показания счетчиков воды'
+    msg['Subject'] = 'Данные по расходу воды'
     message = f"""
     Адрес: пр-т Музрукова, д. 39, кор. 3, кв. 98.
     Имя: Евграшин Павел Юрьевич.

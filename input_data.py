@@ -25,7 +25,7 @@ def _check_float(row: list[str]) -> bool:
 
 def _checked_input() -> list[float] | None:
     """ Returns input string, which fit to row of 4 float numbers """
-    row = []
+    row: None | list = []
     while not row:
         if row is None:
             print('Прекратить ввод данных можно введя любую строку без пробелов.')
