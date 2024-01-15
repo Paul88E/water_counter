@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from environs import Env
 
-from .constants import MAIL_SMTP
+from .constants import MAIL_SMTP, REMINDER
 
 
 @dataclass
@@ -21,7 +21,9 @@ class Config:
     tg_bot: TgBot
     admin_ids: list[int]
     recipient: str
+    recipient_test: str
     mails: dict[str, Mail]
+    reminder: dict[str, str]
 
 
 def _load_ids(ids: str) -> list[int]:
@@ -51,7 +53,9 @@ def load_config(path: str | None = None) -> Config | bool:
     return Config(tg_bot=TgBot(token=env('BOT_TOKEN')),
                   admin_ids=admin_ids,
                   recipient=env('RECIPIENT'),
-                  mails=mails
+                  recipient_test=env('RECIPIENT_TEST'),
+                  mails=mails,
+                  reminder=REMINDER
                   )
 
 
