@@ -1,11 +1,6 @@
 .env
 
-test_file.py
-tasks
-
+.oth/
 .mypy_cache/
-.vscode/
 venv/
-__pycache__/
-.packages/
-.to sort/
+__pycache__
