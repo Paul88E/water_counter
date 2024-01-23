@@ -1,10 +1,8 @@
 import random
-import sched
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
 import tzlocal
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from aiogram import Bot
 
@@ -31,7 +29,7 @@ async def _send_generated_values_was_sent_message(generated_values,
 async def _send_generated_values(bot: Bot):
     if not sent_this_month():
         generated_values = generate_values()
-        if send_data(generated_values, CHOSEN_SERVICE):
+        if send_data(generated_values.values, CHOSEN_SERVICE):
             await _send_generated_values_was_sent_message(generated_values, bot)
             write_log(generated_values)
 

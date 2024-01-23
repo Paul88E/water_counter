@@ -2,7 +2,7 @@ import datetime
 from dataclasses import dataclass
 
 from lexicon import LEXICON
-from .log import WaterValue, LogWaterCounter
+from .log import WaterValue, LogStructure, LogWaterCounter
 from config_data import LOG_NAME, GENERATED_DATA_SPREAD, REMINDER, \
     DEFAULT_VALUES_DELTA_PER_MONTH
 
@@ -92,7 +92,7 @@ def correct_input(text: str) -> Response:
     return Response(VALUES=values, RESPONSE=answer)
 
 
-def write_log(values: WaterValue):
+def write_log(values: LogStructure):
     log.add({datetime.datetime.now(): values})
 
 
@@ -107,21 +107,22 @@ def _calculate_middle_delta() -> WaterValue:
     if len(log.log) == 0:
         return WaterValue(**DEFAULT_VALUES_DELTA_PER_MONTH)
     elif len(log.log) == 1:
-        return list(log.log.values())[0]
-    months = (max(log.log.keys()) - min(log.log.keys())).days / 365 * 12 + 1
-    last_values = list(log.log.values())[-1]
+        return list(log.log.values())[0].values
+    months: float = (max(log.log.keys()) - min(log.log.keys())).days / 365 * 12 + 1
+    last_values: WaterValue = list(log.log.values())[-1].values
     middle_values: dict[str, float] = {}
     for k, v in last_values.__dict__.items():
         middle_values[k] = round(v / months, 2)
     return WaterValue(**middle_values)
 
 
-def generate_values() -> WaterValue:
+def generate_values() -> LogStructure:
     from random import randrange
     generated_delta = _calculate_middle_delta() * (1 + randrange(-GENERATED_DATA_SPREAD * 10,
                                                                  GENERATED_DATA_SPREAD * 10)
                                                    / 1000)
     if len(log.log) == 0:
-        return round(generated_delta, 2)
+        gen_values = round(generated_delta, 2)
     else:
-        return round(list(log.log.values())[-1] + generated_delta, 2)
+        gen_values = round(list(log.log.values())[-1].values + generated_delta, 2)
+    return LogStructure(values=gen_values, falsity=True)
