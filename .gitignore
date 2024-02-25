@@ -1,4 +1,5 @@
 .env
+water_counter.log
 
 .oth/
 .mypy_cache/

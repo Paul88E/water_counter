@@ -27,6 +27,7 @@ async def _send_generated_values_was_sent_message(generated_values,
 
 
 async def _send_generated_values(bot: Bot):
+    """ Sends values to service company, if they weren't sent by user """
     if not sent_this_month():
         generated_values = generate_values()
         if send_data(generated_values.values, CHOSEN_SERVICE):
@@ -35,9 +36,11 @@ async def _send_generated_values(bot: Bot):
 
 
 async def _schedule_sender_generated_values(scheduler: AsyncIOScheduler, bot: Bot):
-    scheduler_start_time = datetime(year=datetime.now().year,
-                                    month=datetime.now().month,
-                                    day=datetime.now().day,
+    """ Schedule, that starts in last day of sending period and starts sending function """
+    now = datetime.now()
+    scheduler_start_time = datetime(year=now.year,
+                                    month=now.month,
+                                    day=int(bot_config.reminder["last_day"]),
                                     hour=random.randrange(HOURS_OF_SENDING_GENERATED_VALUES[0],
                                                           HOURS_OF_SENDING_GENERATED_VALUES[1] + 1),
                                     minute=random.randrange(0, 59),
@@ -51,15 +54,20 @@ async def _schedule_sender_generated_values(scheduler: AsyncIOScheduler, bot: Bo
 
 
 async def schedule_month_schedule_creator(scheduler: AsyncIOScheduler, bot: Bot):
-    """ Every month creates schedule, which generates values and send it by mail """
+    """ Checks day of running bot in month, creates every-month-schedule,
+    which generates schedule of sending values to service company """
+    if datetime.now().day == int(bot_config.reminder["last_day"]):
+        await _schedule_sender_generated_values(scheduler, bot)
     scheduler.add_job(_schedule_sender_generated_values,
                       trigger='cron',
-                      day='1',
-                      args=(scheduler, bot,)
+                      day=int(bot_config.reminder["last_day"]),
+                      args=(scheduler, bot)
                       )
 
 
 async def schedule_reminder_to_send_values(scheduler: AsyncIOScheduler, bot: Bot):
+    """ Schedule, that sends user message with reminding about sending
+     water values to service company """
     scheduler.add_job(_send_reminder_message,
                       trigger='cron',
                       day=bot_config.reminder['days'],
@@ -70,6 +78,8 @@ async def schedule_reminder_to_send_values(scheduler: AsyncIOScheduler, bot: Bot
 
 
 async def schedulers_pack(bot: Bot):
+    """ Creates two schedules: reminder and schedule,
+    that creates another schedule, which sends values """
     scheduler: AsyncIOScheduler = AsyncIOScheduler(
         timezone=str(tzlocal.get_localzone()))
     await schedule_reminder_to_send_values(scheduler, bot)

@@ -1,6 +1,7 @@
 from aiogram import Router
 from aiogram.filters import Command, CommandStart, Text
 from aiogram.types import Message, CallbackQuery
+from aiogram.types.input_file import FSInputFile
 from aiogram.filters import StateFilter
 # from aiogram.fsm.state import default_state
 from aiogram.fsm.context import FSMContext
@@ -8,7 +9,7 @@ from aiogram.fsm.context import FSMContext
 from lexicon import LEXICON
 from utils import correct_input, history_representing, \
     write_log, check_right_days_of_sending, \
-    Response
+    Response, LogStructure
 from keyboards import keyboard_check_and_send_values, keyboard_decreasing_values
 from services import send_data
 from config_data import CHOSEN_SERVICE
@@ -55,6 +56,11 @@ async def process_history_command(message: Message, state: FSMContext):
     await message.answer(text=LEXICON['cancel'])
 
 
+@router.message(Command(commands='get_log_file'))
+async def send_log_file(message: Message):
+    await message.answer_document(FSInputFile("water_counter.log"))
+
+
 @router.message(StateFilter(FSMWaterCounter.default_state))
 async def process_text_while_default_state(message: Message):
     await message.answer(text=LEXICON['/help'])
@@ -85,7 +91,7 @@ async def process_sending_letter(callback: CallbackQuery, state: FSMContext):
     if FSMWaterCounter.current_values:
         if send_data(FSMWaterCounter.current_values, CHOSEN_SERVICE):
             await callback.message.answer(text=LEXICON['data_is_sent'])
-            write_log(FSMWaterCounter.current_values)
+            write_log(LogStructure(FSMWaterCounter.current_values, falsity=False))
             FSMWaterCounter.current_values = None
         else:
             await callback.message.answer(

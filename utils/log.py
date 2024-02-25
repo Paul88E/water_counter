@@ -101,7 +101,7 @@ class LogStructure:
 
 
 class LogWaterCounter:
-    # dict[datetime, LogStructure]
+
     def __init__(self, log_name: str):
         self.log: dict[datetime, LogStructure] = {}
         self.log_name = log_name
